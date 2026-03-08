@@ -1,44 +1,48 @@
-import socket
-import sys
+import socket 
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
+from ipaddress import ip_address
 
+lock = Lock()
+open_ports = []
 
-def scan_port(host, port, timeout=0.5):
+def port_test(ip, port, timeout=3):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(timeout)
-        try:
-            sock.connect((host, port))
-            return True
-        except:
-            return False
+        if sock.connect_ex((ip, port)) == 0:
+            try:
+                # Infos about the port
+                banner = sock.recv(1024).decode().strip()
+            except:
+                banner = "no banner"
 
+            print(f"{port} is open - {banner}")
+            # Avoid race conditions
+            with lock:
+                open_ports.append(port)
+
+
+def ip_to_check(ip):
+    try:
+        ip_address(ip) 
+        return ip
+    except ValueError:
+        raise ValueError("invalid ip")
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python port_scanner.py <host> <port-range>")
-        print("Example: python port_scanner.py localhost 1-1000")
-        sys.exit(1)
 
-    host = sys.argv[1]
-    port_range = sys.argv[2]
+    ip = ip_to_check(input("What ip do you want to test: "))
+    try:
+        start = int(input("Start port: "))
+        end = int(input("End port: "))
+        if start >= end:
+            raise ValueError("Start port must be less than end port")
+    except ValueError:
+        raise ValueError("Enter valid numbers: ")
 
-    b_port = int(port_range.split("-")[0])
-    e_port = int(port_range.split("-")[1])
+    with ThreadPoolExecutor(max_workers=100) as executor:
+        executor.map(lambda p: port_test(ip, p), range(start, end + 1))
+    print(open_ports)
 
-    print(f"Scanning {host} ports in the range {b_port}-{e_port}...")
-
-    open_ports = []
-    for i in range(b_port, e_port + 1):
-        print(f"Scanning port {i}...", end="\r")
-        if scan_port(host, i):
-            open_ports.append(i)
-
-    if open_ports:
-        print(f"\nFound {len(open_ports)} open ports:")
-        for port in open_ports:
-            print(f"Port {port}: Open")
-    else:
-        print(f"\nNo open ports found")
-
-
-if __name__ == "__main__":
-    main()
+if __name__ = "__main__":
+main()
