@@ -45,4 +45,4 @@ def main():
     print(open_ports)
 
 if __name__ == "__main__":
-main()
+    main()
