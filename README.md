@@ -1,17 +1,24 @@
 # Port Scanner
 
-A simple TCP port scanner written in Python.
+A simple TCP port scanner with threading and banner grabbing written in Python.
 
 ## Usage
 ```bash
-python3 port_scanner.py <host> <port-range>
+python3 port_scanner.py
+
 ```
 
 ## Examples
+
+
 ```bash
-python3 port_scanner.py google.com 80-443
-python3 port_scanner.py localhost 1-1000
-python3 port_scanner.py scanme.nmap.org 20-100
+# scanme.nmap.org (45.33.32.156) is a public host maintained by Nmap for testing
+python3 port_scanner.py 
+What ip do you want to test: 45.33.32.156
+Start port: 20
+End port: 1000
+22 is open - SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13
+80 is open - no banner
 ```
 
 ## How It Works
@@ -20,7 +27,9 @@ Uses Python sockets to attempt TCP connections to each port in the specified ran
 
 ## What I Learned
 
+- Race conditions
 - Python socket programming
 - Network scanning basics
-- Command-line argument parsing
 - Error handling with try/except
+- Banner grabbing
+- Threading 

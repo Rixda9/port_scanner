@@ -42,7 +42,6 @@ def main():
 
     with ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(lambda p: port_test(ip, p), range(start, end + 1))
-    print(open_ports)
-
+    print(f"\nFound {len(open_ports)} open ports")
 if __name__ == "__main__":
     main()
