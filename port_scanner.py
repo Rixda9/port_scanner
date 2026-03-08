@@ -44,5 +44,5 @@ def main():
         executor.map(lambda p: port_test(ip, p), range(start, end + 1))
     print(open_ports)
 
-if __name__ = "__main__":
+if __name__ == "__main__":
 main()
